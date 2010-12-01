@@ -2,6 +2,23 @@
 -compile(export_all).
 
 
+start() ->
+    receive
+	{dobam_ctrl, nv_partida} ->
+	    L = gerar_pecas(),
+	    Jogs = dist_pecas( L ),
+	    Tab = [],
+	    dobam_ctrl ! {dobam_partida, { {jogs, Jogs}, {tab, Tab} }},
+	    prim_jog( Tab )
+    end.
+
+prim_jog( Tab ) ->
+    receive
+	{dobam_ctrl, prim_jog} ->
+	    Nv_tab = [ [6,6]| Tab ],
+	    ativo( Nv_tab )
+    end.
+
 %%%%%%%%%%%%%%%%%%%
 %% TABULEIRO
 %%
@@ -13,7 +30,7 @@
 %%
 %%%%%%%%%%%%%%%%%%%
 
-active( Tab ) ->
+ativo( Tab ) ->
     receive
 	{dobam_ctrl, extremos} ->
 	    [P1| _] = Tab,
@@ -22,7 +39,7 @@ active( Tab ) ->
 	    Msg = { {prim, Prim}, {ult, Ult} },
 	    io:format("\n\n~p\n\n", [Msg]),
 %	    dobam_ctrl ! { dobam_partida, Msg },
-	    active( Tab );
+	    ativo( Tab );
 	
 	%% supondo que a verificação já foi realizada,
 	%% jogue!
@@ -36,7 +53,7 @@ active( Tab ) ->
 		     end,
 	    io:format("\n\n~p\n\n", [Nv_tab]),
 	%   dobam_ctrl ! {
-	    active( Nv_tab );
+	    ativo( Nv_tab );
 	
 	{dobam_ctrl, {jogar, ult, Peca}} ->
 	    [_, Ult] = ultima_peca( Tab ),
@@ -46,12 +63,10 @@ active( Tab ) ->
 		B -> Nv_tab = Tab ++ [ [B,A] ]
 	    end,
 	    io:format("\n\n~p\n\n", [Nv_tab]),
-	    active( Nv_tab );
+	    ativo( Nv_tab );
 
 	die -> ok
     end.
-			
-
 
 
 
