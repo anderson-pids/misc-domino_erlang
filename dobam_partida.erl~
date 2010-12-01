@@ -1,0 +1,12 @@
+-module(dobam_partida).
+-compile(export_all).
+
+gerar_pecas() ->
+    L = lists:seq(1,6),
+    [ [A, B] || A <- L,
+		B <- L,
+		B => A
+    ].
+
+dist_pecas() ->
+    
